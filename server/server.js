@@ -1,4 +1,5 @@
 'use strict';
+require('./config/config'); // Set up the environment variables needed
 
 const _ = require('lodash');
 const express = require('express');
@@ -8,7 +9,6 @@ const {mongoose} = require('./db/mongoose'); // Destructuring an object in ES6. 
 const {Todo} = require('./models/todo'); // Destructuring an object in ES6
 const {User} = require('./models/user'); // Destructuring an object in ES6
 
-const port = process.env.PORT || 3000; // In order to deploy to heroku
 const app = express(); // Create the express app
 
 // Middleware is a tool that allows you to add on to the existing funcionality
@@ -96,7 +96,7 @@ app.put('/todos/:id', (req, res) => {
     .catch(error => res.status(400).send({ error }));
 });
 
-app.listen(port, () => console.log('Started on port', port));
+app.listen(process.env.PORT, () => console.log('Successfully started!'));
 
 // Export the app to be able to test it in the tests/server.test.js file
 module.exports = {app}; // ES6 Object syntax. It is the same as {app: app}
