@@ -90,8 +90,9 @@ describe('GET /todos', () => {
 
 describe('GET /todos/:id', () => {
   it('should return todo doc', done => {
+    let id = todos[0]._id;
     request(app)
-      .get(`/todos/${todos[0]._id}`)
+      .get(`/todos/${id}`)
       .expect(200)
       .expect(res => expect(res.body.todo.text).toBe(todos[0].text))
       .end(done);
@@ -109,6 +110,43 @@ describe('GET /todos/:id', () => {
     let id = '123abc';
     request(app)
       .get(`/todos/${id}`)
+      .expect(404)
+      .end(done);
+  });
+});
+
+describe('DELETE /todos/:id', () => {
+  it('should remove a todo', done => {
+    let id = todos[0]._id;
+    request(app)
+      .delete(`/todos/${id}`)
+      .expect(200)
+      .expect(res => expect(res.body.todo._id).toBe(todos[0]._id.toHexString()))
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Todo
+          .findById(id).then(todo => {
+            expect(todo).toBeNull();
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+
+  it('should return 404 for not found todo', done => {
+    let id = new ObjectId();
+    request(app)
+      .delete(`/todos/${id}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for invalid id', done => {
+    let id = '123abc';
+    request(app)
+      .delete(`/todos/${id}`)
       .expect(404)
       .end(done);
   });

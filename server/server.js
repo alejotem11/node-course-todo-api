@@ -46,9 +46,25 @@ app.get('/todos/:id', (req, res) => {
       if (!todo) {
         return res.status(404).send(); // Send empty body
       }
-      res.send({ todo }) // Default http status = 200
+      res.send({ todo }); // Default http status = 200
     })
     .catch(error => res.status(400).send({ error })); // Send empty body
+});
+
+app.delete('/todos/:id', (req, res) => {
+  const {id} = req.params;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).send(); // Send empty body
+  }
+  Todo
+    .findByIdAndDelete(id)
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send(); // Send empty body
+      }
+      res.send({ todo });
+    })
+    .catch(error => res.status(400).send({ error }));
 });
 
 app.listen(port, () => console.log('Started on port', port));
