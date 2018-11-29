@@ -1,14 +1,25 @@
 'use strict';
 
 const mongoose = require('mongoose');
-
-// Database created on https://mlab.com/home
-// const url = 'mongodb://todoapp1:todoapp1@ds121624.mlab.com:21624/nodecourse-todoapi';
-const url = 'mongodb://localhost:27017/nodejs-course';
-
+const env = process.env.NODE_ENV || 'development';
 const opts = { useNewUrlParser: true, useFindAndModify: false };
+let mongodbUrl;
 
-// mongoose.Promise = global.Promise; // Set up mongoose to use Promises built-in javascript lib
-mongoose.connect(url, opts);
+switch (env) {
+  case 'development':
+    mongodbUrl = 'mongodb://localhost:27017/nodejs-course';
+    break;
+  case 'test':
+      mongodbUrl = 'mongodb://localhost:27017/nodejs-course-test'; // when running the test cases with mocha
+      break;
+  case 'production': // Heroku
+      // Database created on https://mlab.com/home
+      mongodbUrl = 'mongodb://todoapp1:todoapp1@ds121624.mlab.com:21624/nodecourse-todoapi';
+      break;
+  default:
+    mongodbUrl = 'mongodb://localhost:27017/nodejs-course';
+}
+
+mongoose.connect(mongodbUrl, opts);
 
 module.exports = { mongoose };
