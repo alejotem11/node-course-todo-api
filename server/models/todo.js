@@ -15,7 +15,10 @@ const todoSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  completedAt: Number
+  completedAt: {
+    type: Number,
+    default: null
+  }
 });
 
 // The first argument is the singular name of the collection your model is for.

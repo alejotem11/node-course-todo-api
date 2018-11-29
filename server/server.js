@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
@@ -61,6 +62,34 @@ app.delete('/todos/:id', (req, res) => {
     .then(todo => {
       if (!todo) {
         return res.status(404).send(); // Send empty body
+      }
+      res.send({ todo });
+    })
+    .catch(error => res.status(400).send({ error }));
+});
+
+app.put('/todos/:id', (req, res) => {
+  const {id} = req.params;
+  // To update just what we want to update, or else anyone could update properties
+  // that we don't want to be updated such as the completedAt or the _id
+  const body = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).send(); // Send empty body
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime(); // In milliseconds
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo
+    .findByIdAndUpdate(id, { $set: body }, { new: true })
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send();
       }
       res.send({ todo });
     })
