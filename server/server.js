@@ -25,6 +25,15 @@ app.post('/todos', (req, res) => {
     .catch(e => res.status(400).send(e));
 });
 
+app.get('/todos', (req, res) => {
+  Todo
+    .find()
+    // In the below line you could send the todos array: res.send(todos), but it
+    // is better to use objects for flexibility, ej: to add new properties to the response
+    .then(todos => res.send({ todos })) // Default http status = 200
+    .catch(e => res.status(400).send(e));
+});
+
 app.listen(port, () => console.log('Started on port', port));
 
 // Export the app to be able to test it in the tests/server.test.js file
