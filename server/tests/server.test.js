@@ -4,13 +4,28 @@ const request = require('supertest');
 const {app} = require('./../server'); // Destructuring an object in ES6
 const {Todo} = require('./../models/todo'); // Destructuring an object in ES6
 
+const todos = [{
+  text: 'Somthing new to do'
+}, {
+  text: 'Another thing to do'
+}];
+
 // Testing lifecycle method [beforeEach], which let us to run some code before
 // any single test case, and is going to move on to the test cases once done() is called.
 // In this case we are going to use it to set up the database to ensure it is empty
 // in order to pass the expect statemt: expect(todos.length).toBe(1); at the end of
 // the [should create a new todo] test case
-beforeEach(done => {
-  Todo.remove({}).then(() => done()); // Remove all the todos from the database
+// beforeEach((done) => {
+//   Todo.deleteMany().then(() => done()); // Remove all the todos from the database
+// });
+
+// Alternately, instead of using the done() callback, you may return a Promise
+// beforeEach(() => Todo.deleteMany());
+
+beforeEach(() => {
+  Todo.deleteMany().then(() => {
+    return Todo.insertMany(todos);
+  });
 });
 
 // Use describe to group the test cases in the output of the the terminal
@@ -33,7 +48,7 @@ describe('POST /todos', () => {
         }
 
         // Check the mongo db state
-        Todo.find().then(todos => {
+        Todo.find({ text }).then(todos => {
           expect(todos.length).toBe(1);
           expect(todos[0].text).toBe(text);
           done();
@@ -45,17 +60,29 @@ describe('POST /todos', () => {
     request(app)
       .post('/todos')
       .send({})
-      .expect(400) // Since in this case we do not need to make assertion about the response we can move on to the end() call right here
+      .expect(400) // Since in this case we do not need to make assertions about the response we can move on to the end() call right here
       .end((err, res) => {
         if (err) {
           return done(err);
         }
 
         Todo.find().then(todos => {
-          expect(todos.length).toBe(0);
+          expect(todos.length).toBe(2);
           done();
         }).catch(e => done(e));
       });
   });
 
+});
+
+describe('GET /todos', () => {
+  it('should get all todos', done => {
+    request(app)
+      .get('/todos')
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todos.length).toBe(2);
+      })
+      .end(done);
+  });
 });
