@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const {ObjectId} = require('mongodb');
 const {mongoose} = require('./db/mongoose'); // Destructuring an object in ES6. Equal to const mongoose = require('./db/mongoose').mongoose
 const {Todo} = require('./models/todo'); // Destructuring an object in ES6
 const {User} = require('./models/user'); // Destructuring an object in ES6
@@ -21,7 +22,7 @@ app.post('/todos', (req, res) => {
   });
   todo
     .save()
-    .then(todo => res.status(201).send(todo))
+    .then(todo => res.status(201).send({ todo }))
     .catch(e => res.status(400).send(e));
 });
 
@@ -32,6 +33,22 @@ app.get('/todos', (req, res) => {
     // is better to use objects for flexibility, ej: to add new properties to the response
     .then(todos => res.send({ todos })) // Default http status = 200
     .catch(e => res.status(400).send(e));
+});
+
+app.get('/todos/:id', (req, res) => {
+  const {id} = req.params;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).send(); // Send empty body
+  }
+  Todo
+    .findById(id)
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send(); // Send empty body
+      }
+      res.send({ todo }) // Default http status = 200
+    })
+    .catch(e => res.status(400).send()); // Send empty body
 });
 
 app.listen(port, () => console.log('Started on port', port));
