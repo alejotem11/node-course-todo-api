@@ -23,7 +23,7 @@ app.post('/todos', (req, res) => {
   todo
     .save()
     .then(todo => res.status(201).send({ todo }))
-    .catch(e => res.status(400).send(e));
+    .catch(error => res.status(400).send({ error }));
 });
 
 app.get('/todos', (req, res) => {
@@ -32,7 +32,7 @@ app.get('/todos', (req, res) => {
     // In the below line you could send the todos array: res.send(todos), but it
     // is better to use objects for flexibility, ej: to add new properties to the response
     .then(todos => res.send({ todos })) // Default http status = 200
-    .catch(e => res.status(400).send(e));
+    .catch(error => res.status(400).send({ error }));
 });
 
 app.get('/todos/:id', (req, res) => {
@@ -48,7 +48,7 @@ app.get('/todos/:id', (req, res) => {
       }
       res.send({ todo }) // Default http status = 200
     })
-    .catch(e => res.status(400).send()); // Send empty body
+    .catch(error => res.status(400).send({ error })); // Send empty body
 });
 
 app.listen(port, () => console.log('Started on port', port));
