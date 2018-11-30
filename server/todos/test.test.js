@@ -2,8 +2,8 @@ const expect = require('expect');
 const request = require('supertest');
 
 const {ObjectId} = require('mongodb');
-const {app} = require('./../server'); // Destructuring an object in ES6
-const {Todo} = require('./../models/todo'); // Destructuring an object in ES6
+const {app} = require('./controller'); // Destructuring an object in ES6
+const {Todo} = require('./todo'); // Destructuring an object in ES6
 
 const todos = [{
   _id: new ObjectId(),
