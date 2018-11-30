@@ -1,0 +1,146 @@
+{
+	"info": {
+		"_postman_id": "98c91b58-4d80-4cb5-a386-78157f0adf0a",
+		"name": "Todo App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "todos",
+			"item": [
+				{
+					"name": "POST /todos",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"text\": \"Sleep\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/todos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"todos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /todos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"text\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/todos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"todos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /todos/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/todos/5c00722d245c0400161ef033",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"todos",
+								"5c00722d245c0400161ef033"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /todos/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/todos/5c0012a93b769300168b4938",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"todos",
+								"5c0012a93b769300168b4938"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /todos/:id",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"completed\": true,\n\t\"text\": \"Study node from postman\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/todos/5c00103d3b769300168b4937",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"todos",
+								"5c00103d3b769300168b4937"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

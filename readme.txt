@@ -12,6 +12,8 @@ npm test
 ó
 npm run test-watch (custom script)
 
+Import the collection and the environments from the <postman> directory in Postman
+
 The app is also deployed on heroku (https://arcane-chamber-70940.herokuapp.com)
 
 /playground/mongodb-connect.js  --> See the use of the mongo native library (mongodb)
