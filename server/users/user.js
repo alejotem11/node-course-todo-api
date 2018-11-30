@@ -5,6 +5,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const secret = 'somesecret'; // This shouldn't be clear in the code, instead it should be in the config file
 const _ = require('lodash');
 
 const userSchema = new mongoose.Schema({
@@ -36,10 +37,10 @@ const userSchema = new mongoose.Schema({
   }]
 });
 
+// Instance method
 userSchema.methods.generateAuthToken = function() {
-  const user = this;
+  const user = this; // Instance
   const access = 'auth';
-  const secret = 'somesecret'; // This shouldn't be clear in the coda, instead it should be in the config file
   const token = jwt.sign({ _id: user.id, access }, secret);
   user.tokens.push({ access, token });
   // user.tokens.concat([{ access, token }]);
@@ -48,6 +49,23 @@ userSchema.methods.generateAuthToken = function() {
 
 userSchema.methods.toJSON = function() {
   return _.pick(this, ['_id', 'email']);
+};
+
+// Model method
+userSchema.statics.findByToken = function (token) {
+  var User = this; // Object
+  var decoded;
+  try {
+    decoded = jwt.verify(token, secret);
+  } catch (e) {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    _id: decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
 };
 
 // The first argument is the singular name of the collection your model is for.

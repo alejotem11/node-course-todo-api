@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
 const {mongoose} = require('./../db/mongoose'); // Destructuring an object in ES6. Equal to const mongoose = require('./db/mongoose').mongoose
 const {User} = require('./user'); // Destructuring an object in ES6
+const {authenticate} = require('./../middleware/authentication');
 
 const app = express(); // Create the express app
 
@@ -25,6 +26,11 @@ app.post('/users', (req, res) => {
     // Prefix the header with "x-" to create custom header
     .then(token => res.status(201).header('x-auth', token).send({user}))
     .catch(error => res.status(400).send({ error }));
+});
+
+// Private route (Use the authenticate middelware)
+app.get('/users/me', authenticate, (req, res) => {
+  res.send({user: req.user, token: req.token});
 });
 
 app.listen(process.env.PORT, () => console.log('Users API running...'));
