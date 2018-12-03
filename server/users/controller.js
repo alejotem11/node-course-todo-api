@@ -23,15 +23,29 @@ app.post('/users', (req, res) => {
   const user = new User(body);
   user
     .save()
-    .then(() => user.generateAuthToken())
-    // Prefix the header with "x-" to create custom header
-    .then(token => res.status(201).header('x-auth', token).send({user}))
+    .then(() => user.generateAuthToken()
+      .then(token =>
+        // Prefix the header with "x-" to create custom header
+        res.status(201).header('x-auth', token).send({user})
+      )
+    )   
     .catch(error => res.status(400).send({ error }));
 });
 
 // Private route (Use the authenticate middelware)
 app.get('/users/me', authenticate, (req, res) => {
   res.send({user: req.user, token: req.token});
+});
+
+app.post('/users/login', (req, res) => {
+  User
+    .findByCredentials(req.body.email, req.body.password)
+    .then(user => {
+      return user
+        .generateAuthToken()
+        .then(token => res.header('x-auth', token).send({ user }))
+    })
+    .catch(error => res.status(400).send({ error }));
 });
 
 app.listen(process.env.PORT, () => console.log('Users API running...'));

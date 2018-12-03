@@ -51,7 +51,7 @@ UserSchema.methods.generateAuthToken = function() {
   return user.save().then(() => token); // return promise
 };
 
-UserSchema.methods.toJSON = function() {
+UserSchema.methods.toJSON = function () {
   return _.pick(this, ['_id', 'email']);
 };
 
@@ -70,6 +70,25 @@ UserSchema.statics.findByToken = function (token) {
     'tokens.token': token,
     'tokens.access': 'auth'
   }); // return promise
+};
+
+UserSchema.statics.findByCredentials = function (email, password) {
+  return new Promise((resolve, reject) => {
+    if (!email || !password) {
+      reject('Email and password are required');
+    }
+    const User = this;
+    User
+      .findOne({ email })
+      .then(user => {
+        if (!user) {
+          reject('Email not found');
+        }
+        bcrypt.compareSync(password, user.password)
+          ? resolve(user) : reject('Invalid password');
+      })
+      .catch(e => reject(e));
+  });
 };
 
 // Mongoose middleware to run before the save() method (instance method) is exectuted
