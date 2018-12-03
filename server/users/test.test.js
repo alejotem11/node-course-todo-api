@@ -111,4 +111,45 @@ describe('USERS', () => {
         .end(done);
     });
   });
+
+  describe('POST /users/login', () => {
+    it('should login user and return a valid auth token in the x-auth header',
+      done => {
+      const credentials = {
+        email: users[0].email,
+        password: users[0].password
+      }
+      request(app)
+        .post('/users/login')
+        .send(credentials)
+        .expect(200)
+        .expect(res => {
+          expect(res.header['x-auth']).toBeTruthy();
+        })
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          User
+            .findByToken(res.header['x-auth'])
+            .then(user => {
+              expect(user.email).toBe(credentials.email);
+              done();
+            })
+            .catch(e => done(e));
+        })
+    });
+
+    it('should reject invalid login', done => {
+      const badCredentials = {
+        email: users[0].email,
+        password: '123456'
+      };
+      request(app)
+        .post('/users/login')
+        .send(badCredentials)
+        .expect(400)
+        .end(done);
+    });
+  });
 });
