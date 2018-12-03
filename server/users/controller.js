@@ -17,6 +17,7 @@ const app = express(); // Create the express app
 // The way to register a midleware is to use app.use([the function you want])
 app.use(bodyParser.json()); // To parse incoming request json bodies under the req.body property
 
+// Sign up route
 app.post('/users', (req, res) => {
   const body = _.pick(req.body, ['email', 'password']);
   const user = new User(body);

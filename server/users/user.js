@@ -48,7 +48,7 @@ UserSchema.methods.generateAuthToken = function() {
   const token = jwt.sign({ _id: user.id, access }, secret);
   user.tokens.push({ access, token });
   // user.tokens.concat([{ access, token }]);
-  return user.save().then(() => token);
+  return user.save().then(() => token); // return promise
 };
 
 UserSchema.methods.toJSON = function() {
@@ -62,14 +62,14 @@ UserSchema.statics.findByToken = function (token) {
   try {
     decoded = jwt.verify(token, secret);
   } catch (e) {
-    return Promise.reject();
+    return Promise.reject(e);
   }
 
   return User.findOne({
     _id: decoded._id,
     'tokens.token': token,
     'tokens.access': 'auth'
-  });
+  }); // return promise
 };
 
 // Mongoose middleware to run before the save() method (instance method) is exectuted
@@ -94,4 +94,4 @@ UserSchema.pre('save', function(next) {
 // Thus, for the example below, the model User is for the users collection in the database
 const User = mongoose.model('User', UserSchema);
 
-module.exports = { User };
+module.exports = { User , secret }; // The secret object is exported in order to use it in the mocha test
