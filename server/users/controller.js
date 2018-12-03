@@ -28,7 +28,7 @@ app.post('/users', (req, res) => {
         // Prefix the header with "x-" to create custom header
         res.status(201).header('x-auth', token).send({user})
       )
-    )   
+    )
     .catch(error => res.status(400).send({ error }));
 });
 
@@ -37,6 +37,7 @@ app.get('/users/me', authenticate, (req, res) => {
   res.send({user: req.user, token: req.token});
 });
 
+// Log in
 app.post('/users/login', (req, res) => {
   User
     .findByCredentials(req.body.email, req.body.password)
@@ -45,6 +46,14 @@ app.post('/users/login', (req, res) => {
         .generateAuthToken()
         .then(token => res.header('x-auth', token).send({ user }))
     })
+    .catch(error => res.status(400).send({ error }));
+});
+
+// Log out
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user // Because of the middelware athenticate
+    .removeToken(req.token)
+    .then(() => res.send())
     .catch(error => res.status(400).send({ error }));
 });
 

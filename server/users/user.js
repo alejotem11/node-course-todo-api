@@ -55,10 +55,19 @@ UserSchema.methods.toJSON = function () {
   return _.pick(this, ['_id', 'email']);
 };
 
+UserSchema.methods.removeToken = function (token) {
+  const user = this;
+  return user.updateOne({
+    $pull: { // $pull Mongo update operator to remove items from an array
+      tokens: { token }
+    }
+  });
+};
+
 // Model method
 UserSchema.statics.findByToken = function (token) {
-  var User = this; // Object
-  var decoded;
+  const User = this; // Object
+  let decoded;
   try {
     decoded = jwt.verify(token, secret);
   } catch (e) {
