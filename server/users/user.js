@@ -9,8 +9,7 @@ const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
 // Used to salt the data when it is going to be encrypted
-// This shouldn't be clear in the code, instead it should be in the config file
-const secret = 'somesecret';
+const secret = process.env.JWT_SECRET;
 
 const UserSchema = new mongoose.Schema({
   email: {

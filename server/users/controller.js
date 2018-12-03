@@ -1,5 +1,7 @@
 'use strict';
-require('./config'); // Set up the environment variables needed
+// Set up the environment variables needed
+const {loadConfig} = require('./../config/config');
+loadConfig('users');
 
 const _ = require('lodash');
 const express = require('express');

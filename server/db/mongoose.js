@@ -7,6 +7,6 @@ const opts = {
   useCreateIndex: true
 };
 
-mongoose.connect(process.env.MONGODB_URL, opts);
+mongoose.connect(process.env.DB_URL, opts);
 
 module.exports = { mongoose };
