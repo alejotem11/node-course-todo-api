@@ -21,7 +21,11 @@ const users = [{
 }, {
   _id: idUserTwo,
   email: 'alejotem_2222@ejemplo.com',
-  password: 'userTwoPass'
+  password: 'userTwoPass',
+  tokens: [{
+    access: access,
+    token: jwt.sign({ _id: idUserTwo, access}, secret)
+  }]
 }];
 
 beforeEach((done) => {
@@ -175,3 +179,5 @@ describe('USERS', () => {
     });
   });
 });
+
+module.exports = { users }; // to be able to use the users created here in the todos test

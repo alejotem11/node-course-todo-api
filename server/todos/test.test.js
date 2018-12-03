@@ -4,15 +4,18 @@ const request = require('supertest');
 const {ObjectId} = require('mongodb');
 const {app} = require('./controller'); // Destructuring an object in ES6
 const {Todo} = require('./todo'); // Destructuring an object in ES6
+const {users} = require('./../users/test.test');
 
 const todos = [{
   _id: new ObjectId(),
-  text: 'Something new to do'
+  text: 'Something new to do',
+  _creator: users[0]._id
 }, {
   _id: new ObjectId(),
   text: 'Another thing to do',
   completed: true,
-  completedAt: 123456
+  completedAt: 123456,
+  _creator: users[1]._id
 }];
 
 // Testing lifecycle method [beforeEach], which let us to run some code before
@@ -42,6 +45,7 @@ describe('TODOS', () => {
       const text = 'Test todo text';
       request(app)
         .post('/todos')
+        .set('x-auth', users[0].tokens[0].token)
         .send({ text }) // ES6 object syntax. Supertest lib is going to convert the object to json
         .expect(201)
         .expect(res => { // To make assertions about the response
@@ -70,6 +74,7 @@ describe('TODOS', () => {
       request(app)
         .post('/todos')
         .send({})
+        .set('x-auth', users[0].tokens[0].token)
         .expect(400) // Since in this case we do not need to make assertions about the response we can move on to the end() call right here
         .end((err, res) => {
           if (err) {
@@ -89,8 +94,9 @@ describe('TODOS', () => {
     it('should get all todos', done => {
       request(app)
         .get('/todos')
+        .set('x-auth', users[0].tokens[0].token)
         .expect(200)
-        .expect(res => expect(res.body.todos.length).toBe(2))
+        .expect(res => expect(res.body.todos.length).toBe(1))
         .end(done);
     });
   });
@@ -100,8 +106,18 @@ describe('TODOS', () => {
       const id = todos[0]._id;
       request(app)
         .get(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(200)
         .expect(res => expect(res.body.todo.text).toBe(todos[0].text))
+        .end(done);
+    });
+
+    it('should not return todo doc created by other user', done => {
+      const id = todos[0]._id;
+      request(app)
+        .get(`/todos/${id}`)
+        .set('x-auth', users[1].tokens[0].token)
+        .expect(404)
         .end(done);
     });
 
@@ -109,6 +125,7 @@ describe('TODOS', () => {
       const id = new ObjectId();
       request(app)
         .get(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(404)
         .end(done);
     });
@@ -117,6 +134,7 @@ describe('TODOS', () => {
       const id = '123abc';
       request(app)
         .get(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(404)
         .end(done);
     });
@@ -127,6 +145,7 @@ describe('TODOS', () => {
       const id = todos[0]._id;
       request(app)
         .delete(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(200)
         .expect(res => expect(res.body.todo._id).toBe(todos[0]._id.toHexString()))
         .end((err, res) => {
@@ -143,10 +162,20 @@ describe('TODOS', () => {
         });
     });
 
+    it('should not remove a todo created by other user', done => {
+      const id = todos[0]._id;
+      request(app)
+        .delete(`/todos/${id}`)
+        .set('x-auth', users[1].tokens[0].token)
+        .expect(404)
+        .end(done);
+    });
+
     it('should return 404 for not found todo', done => {
       const id = new ObjectId();
       request(app)
         .delete(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(404)
         .end(done);
     });
@@ -155,6 +184,7 @@ describe('TODOS', () => {
       const id = '123abc';
       request(app)
         .delete(`/todos/${id}`)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(404)
         .end(done);
     });
@@ -170,6 +200,7 @@ describe('TODOS', () => {
       request(app)
         .put(`/todos/${id}`)
         .send(todoUpdated)
+        .set('x-auth', users[0].tokens[0].token)
         .expect(200)
         .expect(res => {
           expect(res.body.todo.text).toBe(todoUpdated.text);
@@ -194,11 +225,26 @@ describe('TODOS', () => {
         });
     });
 
+    it('should not update the todo created by other user', done => {
+      const id = todos[0]._id;
+      const todoUpdated = {
+        text: "Text updated successfully",
+        completed: true
+      };
+      request(app)
+        .put(`/todos/${id}`)
+        .send(todoUpdated)
+        .set('x-auth', users[1].tokens[0].token)
+        .expect(404)
+        .end(done);
+    });
+
     it('should clear the completedAt property when todo is not completed', done => {
       const id = todos[1]._id;
       request(app)
         .put(`/todos/${id}`)
         .send({ completed: false })
+        .set('x-auth', users[1].tokens[0].token)
         .expect(200)
         .expect(res => {
           expect(res.body.todo.completedAt).toBeNull();

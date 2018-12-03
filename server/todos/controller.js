@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
 const {mongoose} = require('./../db/mongoose'); // Destructuring an object in ES6. Equal to const mongoose = require('./db/mongoose').mongoose
 const {Todo} = require('./todo'); // Destructuring an object in ES6
+const {authenticate} = require('./../middleware/authentication');
 
 const app = express(); // Create the express app
 
@@ -16,9 +17,10 @@ const app = express(); // Create the express app
 // The way to register a midleware is to use app.use([the function you want])
 app.use(bodyParser.json()); // To parse incoming request json bodies under the req.body property
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
   let todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id // Because of the middleware authenticate
   });
   todo
     .save()
@@ -26,22 +28,26 @@ app.post('/todos', (req, res) => {
     .catch(error => res.status(400).send({ error }));
 });
 
-app.get('/todos', (req, res) => {
+app.get('/todos', authenticate, (req, res) => {
   Todo
-    .find()
+    .find({ _creator: req.user._id })
     // In the below line you could send the todos array: res.send(todos), but it
     // is better to use objects for flexibility, ej: to add new properties to the response
     .then(todos => res.send({ todos })) // Default http status = 200
     .catch(error => res.status(400).send({ error }));
 });
 
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
   const {id} = req.params;
   if (!ObjectId.isValid(id)) {
     return res.status(404).send(); // Send empty body
   }
   Todo
-    .findById(id)
+    // .findById(id)
+    .findOne({
+      _id: id,
+      _creator: req.user._id
+    })
     .then(todo => {
       if (!todo) {
         return res.status(404).send(); // Send empty body
@@ -51,13 +57,17 @@ app.get('/todos/:id', (req, res) => {
     .catch(error => res.status(400).send({ error }));
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
   const {id} = req.params;
   if (!ObjectId.isValid(id)) {
     return res.status(404).send(); // Send empty body
   }
   Todo
-    .findByIdAndDelete(id)
+    // .findByIdAndDelete(id)
+    .findOneAndDelete({
+      _id: id,
+      _creator: req.user._id
+    })
     .then(todo => {
       if (!todo) {
         return res.status(404).send(); // Send empty body
@@ -67,7 +77,7 @@ app.delete('/todos/:id', (req, res) => {
     .catch(error => res.status(400).send({ error }));
 });
 
-app.put('/todos/:id', (req, res) => {
+app.put('/todos/:id', authenticate, (req, res) => {
   const {id} = req.params;
   // To update just what we want to update, or else anyone could update properties
   // that we don't want to be updated such as the completedAt or the _id
@@ -85,7 +95,12 @@ app.put('/todos/:id', (req, res) => {
   }
 
   Todo
-    .findByIdAndUpdate(id, { $set: body }, { new: true })
+    // .findByIdAndUpdate(id, { $set: body }, { new: true })
+    .findOneAndUpdate({
+      _id: id,
+      _creator: req.user._id
+    }, { $set: body },
+    { new: true})
     .then(todo => {
       if (!todo) {
         return res.status(404).send();
