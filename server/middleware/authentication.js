@@ -2,7 +2,7 @@ const {User} = require('./../users/user');
 
 // Middelware for private routes
 const authenticate = (req, res, next) => {
-  const token = req.header('x-auth')
+  const token = req.header('x-auth');
   User
     .findByToken(token)
     .then(user => {
