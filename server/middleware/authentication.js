@@ -1,4 +1,4 @@
-const {User} = require('./../users/user');
+const {User} = require('./../users/model');
 
 // Middelware for private routes
 const authenticate = (req, res, next) => {

@@ -3,8 +3,8 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 
 const {ObjectId} = require('mongodb');
-const {app} = require('./controller'); // Destructuring an object in ES6
-const {User, secret} = require('./user'); // Destructuring an object in ES6
+const {app} = require('./../server'); // Destructuring an object in ES6
+const {User, secret} = require('./model'); // Destructuring an object in ES6
 
 const idUserOne = new ObjectId();
 const idUserTwo = new ObjectId();
