@@ -10,9 +10,27 @@
 			"item": [
 				{
 					"name": "POST /todos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ee135c78-2037-4ebe-b2d6-9bdef98664d6",
+								"exec": [
+									"var todoid = pm.response.json().todo._id;",
+									"pm.environment.set(\"todoid\", todoid);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
+							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -22,7 +40,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"text\": \"Sleep\"\n}"
+							"raw": "{\n\t\"text\": \"Study AWS\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/todos",
@@ -38,22 +56,18 @@
 				},
 				{
 					"name": "GET /todos",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
+								"key": "x-auth",
+								"value": "{{x-auth}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"text\": \"\"\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{url}}/todos",
@@ -69,21 +83,30 @@
 				},
 				{
 					"name": "GET /todos/:id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/todos/5c00722d245c0400161ef033",
+							"raw": "{{url}}/todos/{{todoid}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"todos",
-								"5c00722d245c0400161ef033"
+								"{{todoid}}"
 							]
 						}
 					},
@@ -93,19 +116,25 @@
 					"name": "DELETE /todos/:id",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/todos/5c0012a93b769300168b4938",
+							"raw": "{{url}}/todos/{{todoid}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"todos",
-								"5c0012a93b769300168b4938"
+								"{{todoid}}"
 							]
 						}
 					},
@@ -121,6 +150,11 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -128,15 +162,167 @@
 							"raw": "{\n\t\"completed\": true,\n\t\"text\": \"Study node from postman\"\n}"
 						},
 						"url": {
-							"raw": "{{url}}/todos/5c00103d3b769300168b4937",
+							"raw": "{{url}}/todos/{{todoid}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"todos",
-								"5c00103d3b769300168b4937"
+								"{{todoid}}"
 							]
 						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "POST /users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "24c64503-1595-4a38-b72e-f07f16f6c08d",
+								"exec": [
+									"var token = postman.getResponseHeader('x-auth');",
+									"postman.setEnvironmentVariable('x-auth', token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"alejotem_@hotmail.com\",\n\t\"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users/me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/users/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /users/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "82b10522-5550-4729-8e84-e80d45235b1f",
+								"exec": [
+									"var token = postman.getResponseHeader('x-auth');",
+									"postman.setEnvironmentVariable('x-auth', token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"alejotem_11@hotmail.com\",\n\t\"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /users/me/token",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-auth",
+								"value": "{{x-auth}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/users/me/token",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"token"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": ""
+								}
+							]
+						},
+						"description": "Logging out"
 					},
 					"response": []
 				}

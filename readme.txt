@@ -1,5 +1,7 @@
 Description:
 APIs (using express) to interact with a mongodb
+Bcrypt hashing
+Authorization JWT Token
 
 To run it locally:
 Run the command:
@@ -17,3 +19,4 @@ Import the collection and the environments from the <postman> directory in Postm
 The app is also deployed on heroku (https://arcane-chamber-70940.herokuapp.com)
 
 /playground/mongodb-connect.js  --> See the use of the mongo native library (mongodb)
+/playground/hashing.js          --> Hash with sha256, JWT and bcrypt
