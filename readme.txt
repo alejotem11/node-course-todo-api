@@ -18,5 +18,7 @@ Import the collection and the environments from the <postman> directory in Postm
 
 The app is also deployed on heroku (https://arcane-chamber-70940.herokuapp.com)
 
+The config/config.json wouldn't be commited to the github repo
+
 /playground/mongodb-connect.js  --> See the use of the mongo native library (mongodb)
 /playground/hashing.js          --> Hash with sha256, JWT and bcrypt
